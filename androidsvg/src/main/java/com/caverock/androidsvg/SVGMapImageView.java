@@ -9,7 +9,7 @@ import android.widget.ImageView;
 import org.jetbrains.annotations.Nullable;
 
 
-public class SVGMapImageView extends ImageView {
+public class SVGMapImageView extends SVGImageView {
 
     private SVG svg;
 
@@ -17,12 +17,12 @@ public class SVGMapImageView extends ImageView {
         super(context);
     }
 
-    public SVGMapImageView(Context context, @Nullable AttributeSet attrs) {
+    public SVGMapImageView(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
 
-    public SVGMapImageView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
-        super(context, attrs, defStyleAttr);
+    public SVGMapImageView(Context context, AttributeSet attrs, int defStyle) {
+        super(context, attrs, defStyle);
     }
 
     public SVG getSvg() {
@@ -33,29 +33,17 @@ public class SVGMapImageView extends ImageView {
         this.svg = svg;
     }
 
-    public void setSvgResource(SVG svg) {
+    @Override
+    public void setSVG(SVG svg) {
         if (svg == null) {
-            return;
+            throw new IllegalArgumentException("SVG can not be null");
         }
 
         setSvg(svg);
-        Bitmap newBM = Bitmap.createBitmap((int) Math.ceil(svg.getDocumentWidth()), (int) Math.ceil(svg.getDocumentHeight()), Bitmap.Config.ARGB_8888);
-        Canvas canvas = new Canvas(newBM);
-        // Clear background to white
-        canvas.drawRGB(255, 255, 255);
 
-        // Render our document onto our canvas
+        Bitmap bitmap = Bitmap.createBitmap((int) Math.ceil(svg.getDocumentWidth()), (int) Math.ceil(svg.getDocumentHeight()), Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
         svg.renderToCanvas(canvas);
-        setImageBitmap(newBM);
-    }
-
-    @Override
-    public void setOnTouchListener(OnTouchListener l) {
-        super.setOnTouchListener(l);
-    }
-
-    @Override
-    public boolean performClick() {
-        return super.performClick();
+        setImageBitmap(bitmap);
     }
 }

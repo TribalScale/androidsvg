@@ -21,6 +21,7 @@ import android.content.res.AssetManager;
 import android.content.res.Resources;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
+import android.graphics.Path;
 import android.graphics.Picture;
 import android.graphics.Point;
 import android.graphics.RectF;
@@ -1662,6 +1663,25 @@ public class SVG {
         }
 
         public abstract boolean contains(Point point);
+
+        protected RectF initRectF(float[] xyArray) {
+            RectF rectF = new RectF();
+            android.graphics.Path path = new android.graphics.Path();
+
+            for (int i = 0; i < xyArray.length; i++) {
+                int xPoint = (int) xyArray[i];
+                i++;
+                int yPoint = (int) xyArray[i];
+
+                if(i == 0) {
+                    path.moveTo(xPoint, yPoint);
+                } else {
+                    path.lineTo(xPoint, yPoint);
+                }
+            }
+            path.computeBounds(rectF, false);
+            return rectF;
+        }
     }
 
 
@@ -1697,7 +1717,8 @@ public class SVG {
         Length height;
         Length rx;
         Length ry;
-        com.tribalscale.androidcomponents.Polygon polygon;
+
+        private RectF rectF;
 
         @Override
         String getNodeName() {
@@ -1723,23 +1744,20 @@ public class SVG {
 
         @Override
         public boolean contains(Point point) {
-            if (polygon == null) {
-                int[] xPoints = new int[]{
-                        (int) getX().floatValue(),
+            if (rectF == null) {
+                float[] points = new float[] {
+                        getX().floatValue(),
+                        getY().floatValue(),
                         getX().add(getWidth()),
+                        getY().floatValue(),
                         getX().add(getWidth()),
-                        (int) getX().floatValue()
-                };
-                int[] yPoints = new int[]{
-                        (int) getY().floatValue(),
-                        (int) getY().floatValue(),
                         getY().add(getHeight()),
+                        getX().floatValue(),
                         getY().add(getHeight())
                 };
-                polygon = new com.tribalscale.androidcomponents.Polygon(xPoints, yPoints, 4);
-
+                rectF = initRectF(points);
             }
-            return polygon.contains(point);
+            return rectF.contains(point.x, point.y);
         }
     }
 
@@ -1817,7 +1835,8 @@ public class SVG {
 
 
     public static class Polygon extends PolyLine {
-        com.tribalscale.androidcomponents.Polygon polygon;
+
+        private RectF rectF;
 
         @Override
         String getNodeName() {
@@ -1826,17 +1845,10 @@ public class SVG {
 
         @Override
         public boolean contains(Point point) {
-            if (polygon == null) {
-                polygon = new com.tribalscale.androidcomponents.Polygon();
-                for (int i = 0; i < points.length; i++) {
-                    int xPoint = (int) points[i];
-                    i++;
-                    int yPoint = (int) points[i];
-
-                    polygon.addPoint(xPoint, yPoint);
-                }
+            if (rectF == null) {
+                rectF = initRectF(getPoints());
             }
-            return polygon.contains(point);
+            return rectF.contains(point.x, point.y);
         }
     }
 
