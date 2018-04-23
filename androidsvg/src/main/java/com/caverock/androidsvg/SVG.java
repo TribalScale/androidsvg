@@ -1673,7 +1673,8 @@ public class SVG {
                 i++;
                 int yPoint = (int) xyArray[i];
 
-                if(i == 0) {
+                //To ensure we have x and y position to make the first move.
+                if(i == 1) {
                     path.moveTo(xPoint, yPoint);
                 } else {
                     path.lineTo(xPoint, yPoint);
