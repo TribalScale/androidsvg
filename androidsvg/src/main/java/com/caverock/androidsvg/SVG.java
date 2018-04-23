@@ -2411,30 +2411,4 @@ public class SVG {
         }
         return result;
     }
-
-    private List<SvgObject> touchObjects = new ArrayList<>();
-
-    // Returns touched locations. In our case it will be two for poi_area and delivery_zones
-    public List<Pair> getSelectedLocations(int x, int y) {
-
-        List<Pair> locations = new ArrayList<>();
-
-        if (touchObjects.isEmpty()) {
-            touchObjects.addAll(getElementsByTagName(Rect.class));
-            touchObjects.addAll(getElementsByTagName(Polygon.class));
-        }
-
-        for (SvgObject object : touchObjects) {
-            if (object instanceof GraphicsElement) {
-                GraphicsElement element = (GraphicsElement) object;
-                if (element.contains(new Point(x, y))) {
-                    locations.add(new Pair(element.document.getDocumentTitle(), element.getId()));
-                }
-            }
-        }
-
-        return locations;
-    }
-
-
 }
